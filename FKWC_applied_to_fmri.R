@@ -8,15 +8,30 @@ DIM2=dim(imag_array)[2]
 DIM3=dim(imag_array)[3]
 
 
-#generate a 3 dimensional unit function
-generate_unit_function=function(dim_img=c(DIM1,DIM2,DIM3)){
-  uv_func=array(rnorm(prod(dim_img)),dim=dim_img)
-  return(uv_func)
+dim_img=dim(imag_array)
+prod(dim_img)
+random_directions=array(0,dim=c(dim_img,M))
+
+#lets try multiplying together
+
+d1=fda.usc::rproc2fdata( M,t = seq(0,1,l=DIM1),norm = TRUE)
+d2=fda.usc::rproc2fdata( M,t = seq(0,1,l=DIM2),norm = TRUE)
+d3=fda.usc::rproc2fdata( M,t = seq(0,1,l=DIM3),norm = TRUE)
+
+#Now combine into one function
+for(i in 1:DIM1){
+  for(j in 1:DIM2){
+    for(k in 1:DIM3){
+      random_directions[i,j,k,]=d1$data[,i]*d2$data[,j]*d3$data[,k]
+    }
+  }
 }
 
-#num random direnctions
-M=50
-random_directions=replicate(M,generate_unit_function())
+#normalize
+for(i in 1:M){
+  random_directions[,,,i]= random_directions[,,,i]/sqrt(sum(c(random_directions[,,,i])^2))
+}
+
 
 #project a 3d image onto unit function
 project=function(uv,img3d){
